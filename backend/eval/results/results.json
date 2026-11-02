@@ -1,0 +1,21 @@
+{
+  "dataset_size": 10,
+  "retrieval": {
+    "vector": {
+      "hit_at_5": 1.0,
+      "mrr": 1.0
+    },
+    "bm25": {
+      "hit_at_5": 1.0,
+      "mrr": 1.0
+    },
+    "hybrid + rerank": {
+      "hit_at_5": 1.0,
+      "mrr": 1.0
+    }
+  },
+  "hybrid_rerank_answer_quality": {
+    "faithfulness": 1.0,
+    "answer_relevance": 1.0
+  }
+}
