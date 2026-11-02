@@ -1,0 +1,52 @@
+[
+  {
+    "question": "When did Northstar Solar Co-op begin operating?",
+    "answer": "It began operating in 2021.",
+    "expected_document": "solar_guide.md"
+  },
+  {
+    "question": "How much does a standard Northstar membership share cost each month?",
+    "answer": "A standard share costs $18 per month.",
+    "expected_document": "solar_guide.md"
+  },
+  {
+    "question": "How many panels are in Northstar's community solar garden?",
+    "answer": "The garden has 240 panels.",
+    "expected_document": "solar_guide.md"
+  },
+  {
+    "question": "How much electricity did the solar garden generate in 2025?",
+    "answer": "It generated 128,400 kilowatt-hours in 2025.",
+    "expected_document": "solar_guide.md"
+  },
+  {
+    "question": "What days and hours is the Harbor City Maritime Museum open?",
+    "answer": "It is open Tuesday through Sunday from 10 a.m. to 5 p.m.",
+    "expected_document": "harbor_museum.md"
+  },
+  {
+    "question": "How much is adult admission at the maritime museum?",
+    "answer": "Adult admission is $14.",
+    "expected_document": "harbor_museum.md"
+  },
+  {
+    "question": "When did the Harbor City Maritime Museum open?",
+    "answer": "It opened in 1987.",
+    "expected_document": "harbor_museum.md"
+  },
+  {
+    "question": "How many digital books may a Cedar County Library cardholder borrow at once?",
+    "answer": "A cardholder may borrow up to five digital books at a time.",
+    "expected_document": "cedar_library.md"
+  },
+  {
+    "question": "How long is a Cedar County Library digital book loan?",
+    "answer": "A digital loan lasts 21 days.",
+    "expected_document": "cedar_library.md"
+  },
+  {
+    "question": "How long does a reader have to borrow a held library title after the email notice?",
+    "answer": "The reader has 72 hours to borrow it.",
+    "expected_document": "cedar_library.md"
+  }
+]
