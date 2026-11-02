@@ -132,6 +132,7 @@ def chat(request: ChatRequest, db: Session = Depends(get_db)) -> StreamingRespon
             citation_sources = [
                 {
                     **item,
+                    "text": item["snippet"],
                     "metadata": {
                         "filename": item["filename"],
                         "page": item["page"],

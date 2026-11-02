@@ -68,11 +68,11 @@ def test_chat_stream_persists_answer_and_sources(client, monkeypatch) -> None:
         "get_sources",
         lambda question, document_ids=None: (question, [source], [source]),
     )
-    monkeypatch.setattr(
-        chat_router,
-        "stream_answer",
-        lambda question, sources, provider: iter(["It began in 2024 [1]."]),
-    )
+    def fake_stream_answer(question, sources, provider):
+        assert sources[0]["text"] == source["text"]
+        yield "It began in 2024 [1]."
+
+    monkeypatch.setattr(chat_router, "stream_answer", fake_stream_answer)
 
     response = client.post("/api/chat", json={"question": "When did it begin?"})
 

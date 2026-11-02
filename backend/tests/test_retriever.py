@@ -1,6 +1,6 @@
 """Tests for hybrid retrieval fusion."""
 
-from app.services import retriever
+from app.services import retriever, vectorstore
 from app.services.retriever import reciprocal_rank_fusion
 
 
@@ -52,3 +52,19 @@ def test_hybrid_retriever_queries_both_indexes(monkeypatch) -> None:
 
     assert calls == {"vector": 1, "bm25": 1}
     assert {item["id"] for item in result} == {"vector-id", "keyword-id"}
+
+
+def test_vector_search_caps_results_and_applies_document_filter(monkeypatch) -> None:
+    class CollectionStub:
+        def count(self):
+            return 3
+
+        def query(self, **kwargs):
+            return kwargs
+
+    monkeypatch.setattr(vectorstore, "get_collection", CollectionStub)
+
+    result = vectorstore.search([0.0, 1.0], 20, ["doc-id"])
+
+    assert result["n_results"] == 3
+    assert result["where"] == {"doc_id": {"$in": ["doc-id"]}}

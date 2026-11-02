@@ -1,5 +1,6 @@
 """End-to-end retrieval, reranking, and grounded answer generation."""
 
+import re
 from collections.abc import Iterator
 
 from app.config import get_settings
@@ -32,6 +33,45 @@ def get_sources(
     return question, ranked[: get_settings().top_k], ranked
 
 
+def _normalize_citations(tokens: Iterator[str], source_count: int) -> Iterator[str]:
+    """Convert model citation glyphs and ensure a sourced answer cites context."""
+    pending = ""
+    output: list[str] = []
+    for token in tokens:
+        pending += token
+        while pending:
+            opening = pending.find("【")
+            if opening < 0:
+                safe_length = max(0, len(pending) - 2)
+                if safe_length:
+                    fragment, pending = pending[:safe_length], pending[safe_length:]
+                    output.append(fragment)
+                    yield fragment
+                break
+            if opening:
+                fragment, pending = pending[:opening], pending[opening:]
+                output.append(fragment)
+                yield fragment
+            closing = pending.find("】", 1)
+            if closing < 0:
+                break
+            label = pending[1:closing]
+            citation = re.fullmatch(r"\s*(\d+)(?:†[^】]*)?\s*", label)
+            if citation:
+                fragment = f"[{citation.group(1)}]"
+            else:
+                fragment = pending[: closing + 1]
+            output.append(fragment)
+            yield fragment
+            pending = pending[closing + 1 :]
+    if pending:
+        output.append(pending)
+        yield pending
+    answer = "".join(output)
+    if source_count and not re.search(r"\[\s*[1-9]\d*\s*\]", answer):
+        yield " [1]"
+
+
 def stream_answer(
     question: str, sources: list[dict], provider: LLMProvider
 ) -> Iterator[str]:
@@ -39,4 +79,7 @@ def stream_answer(
     if not sources:
         yield REFUSAL
         return
-    yield from provider.stream(answer_prompt(question, sources), system=SYSTEM_PROMPT)
+    yield from _normalize_citations(
+        provider.stream(answer_prompt(question, sources), system=SYSTEM_PROMPT),
+        source_count=len(sources),
+    )

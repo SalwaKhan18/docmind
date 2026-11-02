@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
@@ -17,6 +18,7 @@ logger = logging.getLogger(__name__)
 @lru_cache
 def get_reranker() -> CrossEncoder:
     """Load and cache the configured cross-encoder."""
+    os.environ["USE_TF"] = "0"
     from sentence_transformers import CrossEncoder
 
     model_name = get_settings().reranker_model

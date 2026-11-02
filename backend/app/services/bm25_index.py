@@ -61,17 +61,27 @@ def remove_document(doc_id: str) -> None:
 
 def search(query: str, limit: int, document_ids: list[str] | None) -> list[dict]:
     """Return BM25-ranked chunks and normalized display scores."""
+    query_tokens = _tokens(query)
+    if not query_tokens:
+        return []
     entries = load_index()
     if document_ids:
         entries = [e for e in entries if e["metadata"]["doc_id"] in document_ids]
     if not entries:
         return []
     model = BM25Okapi([_tokens(entry["text"]) for entry in entries])
-    scores = model.get_scores(_tokens(query))
+    scores = model.get_scores(query_tokens)
     ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)[:limit]
+    minimum = min(score for _, score in ranked)
     maximum = max((score for _, score in ranked), default=0)
     return [
-        {**entries[index], "bm25_score": float(score / maximum) if maximum > 0 else 0.0}
+        {
+            **entries[index],
+            "bm25_score": (
+                float((score - minimum) / (maximum - minimum))
+                if maximum > minimum
+                else 1.0
+            ),
+        }
         for index, score in ranked
-        if score > 0
     ]

@@ -4,6 +4,7 @@ from functools import lru_cache
 
 import chromadb
 from chromadb.api.models.Collection import Collection
+from chromadb.config import Settings
 
 from app.config import get_settings
 
@@ -13,7 +14,9 @@ def get_collection() -> Collection:
     """Return the persistent document-chunk collection."""
     path = get_settings().data_dir / "chroma"
     path.mkdir(parents=True, exist_ok=True)
-    client = chromadb.PersistentClient(path=str(path))
+    client = chromadb.PersistentClient(
+        path=str(path), settings=Settings(anonymized_telemetry=False)
+    )
     return client.get_or_create_collection(
         name="docmind_chunks", metadata={"hnsw:space": "cosine"}
     )
@@ -42,7 +45,7 @@ def search(
     """Search vectors, optionally restricted to selected documents."""
     collection = get_collection()
     filters = {"doc_id": {"$in": document_ids}} if document_ids else None
-    available = collection.count(where=filters) if filters else collection.count()
+    available = collection.count()
     if available == 0:
         return {"ids": [[]], "documents": [[]], "metadatas": [[]], "distances": [[]]}
     return collection.query(
